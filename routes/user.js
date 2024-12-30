@@ -4,28 +4,18 @@ import crypto from "node:crypto";
 import multer from 'multer';
 import { generateFileName, uploadFile } from '../config/UploadFile.js';
 import ProductModel from '../models/ProductModel.js';
+import UserController from '../controllers/UserController.js';
+import { tokenAuthentication } from '../config/tokenAuthentication.js';
 const router = express.Router();
 
 router.post("/loginUser", (req, res) => {
-    res.send("Hello")
+    UserController.login(req, res)
 })
 
 router.post("/registerUser", (req, res) => {
 
-    try {
-        let requestBody = req.body
-        let getPassword = crypto.createHash("md5").update(requestBody.password).digest("hex");
-        let userData = {
-            name: requestBody.name,
-            email: requestBody.email,
-            address: requestBody.address,
-            password: getPassword
-        }
-        UserModel.insertUser(userData)
-        res.send({ status: "Success" })
-    } catch (e) {
-        res.send({ status: "Failed", error: e })
-    }
+    UserController.registerUser(req, res)
+
 })
 
 const upload = multer({ storage: uploadFile() })
@@ -46,7 +36,7 @@ router.use("/uploadFile", upload.single("image"), (req, res) => {
     }
 })
 
-router.post("/getAllProducts", async (req, res) => {
+router.post("/getAllProducts", tokenAuthentication, async (req, res) => {
     const products = await ProductModel.findAll()
     try {
         if (!products.length) {
@@ -57,6 +47,18 @@ router.post("/getAllProducts", async (req, res) => {
     } catch (error) {
         console.error("Error fetching products:", error);
         res.status(500).send({ status: "Failed", error: error.message });
+    }
+})
+
+router.post("/search", async (req, res) => {
+    try {
+        let productName = req.body.productName
+        const productData = await ProductModel.searchProduct(
+            productName
+        )
+        res.send({ status: "Success", products: productData })
+    } catch (e) {
+        res.send({ status: "Failed", Error: e.message })
     }
 })
 

@@ -20,6 +20,11 @@ class ProductModel {
     async findByQueries(queries) {
         return await this.model.findOne(queries);
     }
+
+    async searchProduct(productData) {
+        return await this.model.find({ "productName": { $regex: productData.productName, $options: 'i' } })
+    }
+
     async findsByQueries(queries, sortBy = 'desc') {
         return await this.model.find(queries).sort({ _id: (sortBy == 'desc') ? -1 : 1 })
     }
