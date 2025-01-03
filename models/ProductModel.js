@@ -28,6 +28,12 @@ class ProductModel {
     async findsByQueries(queries, sortBy = 'desc') {
         return await this.model.find(queries).sort({ _id: (sortBy == 'desc') ? -1 : 1 })
     }
+
+    async findProductById(id) {
+        const objectId = new mongoose.Types.ObjectId(id);
+        return await this.findByQueries({ _id: objectId });
+    }
+
     async findAll() {
         return await this.model.find();
     }

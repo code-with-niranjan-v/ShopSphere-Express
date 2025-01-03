@@ -30,7 +30,7 @@ class UserController {
             let user = await UserModel.findByQueries(userData)
             if (user) {
                 let token = generateToken(user)
-                res.send({ status: "Success", token: token })
+                res.send({ status: "Success", token: token, uid: user._id })
                 console.log(user)
             } else {
                 res.send({ status: "Failed", message: "User Not Found" })

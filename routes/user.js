@@ -6,6 +6,7 @@ import { generateFileName, uploadFile } from '../config/UploadFile.js';
 import ProductModel from '../models/ProductModel.js';
 import UserController from '../controllers/UserController.js';
 import { tokenAuthentication } from '../config/tokenAuthentication.js';
+import CartModel from '../models/CartModel.js';
 const router = express.Router();
 
 router.post("/loginUser", (req, res) => {
@@ -61,5 +62,40 @@ router.post("/search", async (req, res) => {
         res.send({ status: "Failed", Error: e.message })
     }
 })
+
+router.post("/addcart", async (req, res) => {
+    try {
+        let requestData = req.body;
+        let cartData = {
+            uid: requestData.uid,
+            productIds: requestData.productIds
+        }
+        CartModel.insertCart(cartData)
+        res.send({ status: "SUCESS", })
+    } catch (e) {
+        res.send({ status: "FAILURE", message: e.message })
+    }
+})
+
+router.post("/getcart", async (req, res) => {
+    try {
+        let requestData = req.body;
+        let data = await CartModel.findById(requestData.uid);
+        res.send({ status: "SUCESS", data: data })
+    } catch (e) {
+        res.send({ status: "FAILURE", message: e.message })
+    }
+})
+
+router.post("/getProductById", async (req, res) => {
+    try {
+        let requestData = req.body;
+        let data = await ProductModel.findProductById(requestData.productId);
+        res.send({ status: "SUCESS", data: data })
+    } catch (e) {
+        res.send({ status: "FAILURE", message: e.message })
+    }
+})
+
 
 export default router;
